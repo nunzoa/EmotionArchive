@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" 
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>market</title>
+<script th:src="@{/js/jquery-3.6.0.js}"></script>
+<script>
+$(document).ready(function () {
+	$('#category').change(search);
+	$('#searchWord').keyup(search);
+	search();
+});
+
+function search() {
+	let category = $('#category').val();
+	let searchWord = $('#searchWord').val();
+
+	$.ajax({
+		url : 'search',
+		type: 'post',
+		data: {category:category, searchWord:searchWord},
+		dataType: 'json',
+		success: output,
+		error: function(e) {
+			alert(JSON.stringify(e));
+		}
+	});
+}
+
+function output(list) {
+	let str = '';
+	
+	str += '<table>';
+	str += '<tr>';
+	str += '	<th>번호</th>';
+	str += '	<th>카테고리</th>';
+	str += '	<th>제목</th>';
+	str += '</tr>';
+	
+	$(list).each(function (i, ob) {
+		str += '<tr>';
+		str += '	<td>' + ob.boardnum + '</td>';
+		str += '	<td>' + ob.category + '</td>';
+		str += '	<td>' + ob.title + '</td>';
+		str += '</tr>';
+	});
+	str += '</table>';
+
+	$('#output').html(str);
+}
+</script>
+</head>
+<body>
+<header>
+	<h1>[ 판매 상품 검색 ]</h1>
+</header>
+<section> 
+	<!-- 검색 폼 -->
+	<p>
+		<select id="category">
+			<option value="all" th:selected="${category} == 'all'">전체</option>
+			<option value="computer" th:selected="${category} == 'computer'">컴퓨터 및 주변기기</option>
+			<option value="camera" th:selected="${category} == 'camera'">카메라</option>
+			<option value="car" th:selected="${category} == 'car'">자동차 용품</option>
+		</select>
+		<input type="text" id="searchWord" th:value="${searchWord}">
+	</p>
+	
+	<!-- 글목록 출력 영역 -->
+	<div id="output">
+	</div>
+	
+</section>
+</body>
+</html>
+
+

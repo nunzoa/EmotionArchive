@@ -1,0 +1,117 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.softsociety.exam.dao.BoardDAO">
+
+<!--판매글 저장 -->
+<insert id="insertBoard" parameterType="Board">
+	insert 
+	into 
+		market_board (
+			boardnum
+			, memberid
+			, title
+			, contents
+			, category
+		)
+	values (
+			market_board_seq.nextval
+			, #{memberid}
+			, #{title}
+			, #{contents}
+			, #{category}
+		)
+</insert>
+
+<!-- 판매글 읽기 -->
+<select id="selectBoard" parameterType="int" resultType="Board">
+	select 
+		*
+	from 
+		market_board
+	where 
+		boardnum = #{boardnum}
+</select>
+
+<!-- 판매글 목록 -->
+<select id="selectBoardList" resultType="Board">
+	select 
+		*
+	from 
+		market_board
+	where
+		soldout = 'N'
+	order by boardnum desc
+</select>
+
+<!-- 상품 검색 -->
+<select id="search" parameterType="map" resultType="Board">
+	select 
+		*
+	from 
+		market_board
+	<where>
+		<if test="category != null and category != 'all'">
+			category = #{category}
+		</if>
+		<if test="searchWord != null">
+			and title like '%' || #{searchWord} || '%'
+		</if>
+		and soldout = 'N'
+	</where> 
+	order by boardnum desc
+</select>
+
+<!-- 판매글 삭제 -->
+<delete id="deleteBoard" parameterType="Board">
+	delete
+	from
+		market_board
+	where
+		boardnum = #{boardnum}
+		and memberid = #{memberid}
+</delete>
+
+<!-- 구매 처리 -->
+<update id="buy" parameterType="Board">
+	update 
+		market_board
+	set
+		soldout = 'Y'
+		, buyerid = #{buyerid}
+	where
+		boardnum = #{boardnum}
+</update>
+
+<!-- 리플 저장 -->
+<insert id="insertReply" parameterType="Reply">
+	insert 
+	into 
+		market_reply (
+			replynum
+			, boardnum
+			, memberid
+			, replytext
+		)
+	values (
+			market_reply_seq.nextval
+			, #{boardnum}
+			, #{memberid}
+			, #{replytext}
+	)
+</insert>
+
+<!-- 리플 목록 -->
+<select id="selectReplyList" parameterType="int" resultType="Reply">
+	select
+		*
+	from
+		market_reply
+	where
+		boardnum = #{boardnum}
+	order by
+		replynum
+</select>
+
+</mapper>
